@@ -1,0 +1,3 @@
+var Sprite = Object.extend({
+
+});
