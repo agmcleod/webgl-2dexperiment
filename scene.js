@@ -12,10 +12,10 @@ var Scene = {
   },
 
   draw: function () {
-    requestAnimationFrame(this.draw.bind(this));
+    this.resize();
     var delta = this.getDeltaTime();
     
-    gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     mat4.identity(this.mvMatrix);
@@ -34,7 +34,7 @@ var Scene = {
       }
     }
 
-    mat4.perspective(this.pMatrix, 45 * Math.PI / 180, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0);
+    mat4.perspective(this.pMatrix, 45 * Math.PI / 180, gl.canvas.clientWidth / gl.canvas.clientHeight, 0.1, 100.0);
     mat4.translate(this.pMatrix, this.pMatrix, [0.0, 0.0, -50.0]);
     mat4.translate(this.mvMatrix, this.mvMatrix, [0.0, this.y, 0.0]);
 
@@ -46,6 +46,7 @@ var Scene = {
 
     this.setMatrixUniforms();
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.planePositionBuffer.numItems);
+    requestAnimationFrame(this.draw.bind(this));
   },
 
   getDeltaTime: function () {
@@ -99,6 +100,16 @@ var Scene = {
 
     shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
     shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
+  },
+
+  resize: function () {
+    var width = gl.canvas.clientWidth;
+    var height = gl.canvas.clientHeight;
+    if (gl.canvas.width != width ||
+      gl.canvas.height != height) {
+      gl.canvas.width = width;
+      gl.canvas.height = height;
+    }
   },
 
   setMatrixUniforms: function () {

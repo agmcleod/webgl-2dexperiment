@@ -46,9 +46,9 @@
       var gl;
       function initWebGL () {
         var canvas = document.getElementById('canvas');
+
         gl = canvas.getContext('experimental-webgl');
-        gl.viewportWidth = canvas.width;
-        gl.viewportHeight = canvas.height;
+        gl.canvas = canvas;
         Scene.init();
       }
 
