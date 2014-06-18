@@ -6,8 +6,7 @@ var Scene = {
     this.initShaders();
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.enable(gl.DEPTH_TEST);
-    this.direction = 1;
-    this.y = 0;
+    this.sprite = new Sprite();
     this.draw();
   },
 
@@ -21,22 +20,10 @@ var Scene = {
     mat4.identity(this.mvMatrix);
     mat4.identity(this.pMatrix);
     
-    if (this.direction > 0) {
-      this.y += 1.5 * delta;
-      if (this.y > 5) {
-        this.direction = -1;
-      }
-    }
-    else {
-      this.y -= 1.5 * delta;
-      if (this.y < -5) {
-        this.direction = 1;
-      }
-    }
-
     mat4.perspective(this.pMatrix, 45 * Math.PI / 180, gl.canvas.clientWidth / gl.canvas.clientHeight, 0.1, 100.0);
     mat4.translate(this.pMatrix, this.pMatrix, [0.0, 0.0, -50.0]);
-    mat4.translate(this.mvMatrix, this.mvMatrix, [0.0, this.y, 0.0]);
+    
+    this.sprite.update(delta, this.mvMatrix);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.planePositionBuffer);
     gl.vertexAttribPointer(this.shader.shaderProgram.vertexPositionAttribute, this.planePositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
