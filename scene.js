@@ -22,14 +22,14 @@ var Scene = {
     mat4.identity(this.pMatrix);
     
     if (this.direction > 0) {
-      this.y += 0.05 * delta;
-      if (this.y > 1) {
+      this.y += 1.5 * delta;
+      if (this.y > 5) {
         this.direction = -1;
       }
     }
     else {
-      this.y -= 0.05 * delta;
-      if (this.y < -1) {
+      this.y -= 1.5 * delta;
+      if (this.y < -5) {
         this.direction = 1;
       }
     }
@@ -54,7 +54,7 @@ var Scene = {
     if (this.time) {
       var t = this.time;
       this.time = Date.now();
-      delta = this.time - t;
+      delta = (this.time - t) / 1000;
     }
     else {
       delta = 0;
