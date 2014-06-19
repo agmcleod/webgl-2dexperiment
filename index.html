@@ -40,7 +40,8 @@
     <script src="gl-matrix.js"></script>
     <script src="ji.js"></script>
     <script src="shader.js"></script>
-    <script src="scene.js"></script>
+    <script src="game.js"></script>
+    <script src="webgl_renderer.js"></script>
     <script src="sprite.js"></script>
     <script>
       var gl;
@@ -49,7 +50,7 @@
 
         gl = canvas.getContext('experimental-webgl');
         gl.canvas = canvas;
-        Scene.init();
+        Game.init();
       }
 
       initWebGL();
