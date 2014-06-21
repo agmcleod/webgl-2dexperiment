@@ -48,17 +48,22 @@ var WebGLRenderer = {
     
     mat4.perspective(this.pMatrix, 45 * Math.PI / 180, gl.canvas.clientWidth / gl.canvas.clientHeight, 0.1, 100.0);
     mat4.translate(this.pMatrix, this.pMatrix, [0.0, 0.0, -50.0]);
+
+    var shaderProgram = this.shader.shaderProgram;
     
     for (var i = 0; i < this.objects.length; i++) {
       this.objects[i].update(delta, this.mvMatrix);
     }
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.planePositionBuffer);
-    gl.vertexAttribPointer(this.shader.shaderProgram.vertexPositionAttribute, this.planePositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, this.planePositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.textureBuffer);
+    gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, this.textureBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, me.loader.getImage('mobileplayer'));
-    gl.uniform1i(this.shader.shaderProgram.samplerUniform, 0);
+    gl.uniform1i(shaderProgram.samplerUniform, 0);
 
     this.setMatrixUniforms();
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.planePositionBuffer.numItems);
@@ -97,10 +102,10 @@ var WebGLRenderer = {
     this.textureBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.textureBuffer);
     var textureCoords = [
-      0.0, 0.0,
-      1.0, 0.0,
       0.0, 1.0,
-      1.0, 1.0
+      0.0, 0.0,
+      1.0, 1.0,
+      1.0, 0.0
     ];
 
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords), gl.STATIC_DRAW);
@@ -113,6 +118,9 @@ var WebGLRenderer = {
     var shaderProgram = this.shader.shaderProgram;
     shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
     gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
+
+    shaderProgram.textureCoordAttribute = gl.getAttribLocation(shaderProgram, "aTextureCoord");
+    gl.enableVertexAttribArray(shaderProgram.textureCoordAttribute);
 
     shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
     shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
