@@ -56,13 +56,12 @@ var WebGLRenderer = {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.planePositionBuffer);
     gl.vertexAttribPointer(this.shader.shaderProgram.vertexPositionAttribute, this.planePositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.planeVertexColorBuffer);
-    gl.vertexAttribPointer(this.shader.shaderProgram.vertexColorAttribute, this.planeVertexColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, me.loader.getImage('mobileplayer'));
+    gl.uniform1i(this.shader.shaderProgram.samplerUniform, 0);
 
     this.setMatrixUniforms();
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.planePositionBuffer.numItems);
-
-
     requestAnimationFrame(this.draw.bind(this));
   },
 
@@ -95,18 +94,18 @@ var WebGLRenderer = {
     this.planePositionBuffer.itemSize = 3;
     this.planePositionBuffer.numItems = 4;
 
-    this.planeVertexColorBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.planeVertexColorBuffer);
-    var colors = [
-      1.0, 0.0, 0.0, 1.0,
-      0.0, 1.0, 0.0, 1.0,
-      0.0, 0.0, 1.0, 1.0,
-      1.0, 0.0, 0.0, 1.0
+    this.textureBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.textureBuffer);
+    var textureCoords = [
+      0.0, 0.0,
+      1.0, 0.0,
+      0.0, 1.0,
+      1.0, 1.0
     ];
 
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
-    this.planeVertexColorBuffer.itemSize = 4;
-    this.planeVertexColorBuffer.numItems = 4;
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords), gl.STATIC_DRAW);
+    this.textureBuffer.itemSize = 2;
+    this.textureBuffer.numItems = 4;
   },
 
   initShaders: function () {
@@ -117,6 +116,7 @@ var WebGLRenderer = {
 
     shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
     shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
+    shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "uSampler");
   },
 
   mvPopMatrix: function () {

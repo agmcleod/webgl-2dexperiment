@@ -74,10 +74,20 @@
          */
         function preloadImage(img, onload, onerror) {
             // create new Image object and add to list
-            imgList[img.name] = new Image();
-            imgList[img.name].onload = onload;
-            imgList[img.name].onerror = onerror;
-            imgList[img.name].src = img.src + api.nocache;
+            var image;
+            // TODO: Check if webgl renderer
+            if (true) {
+                imgList[img.name] = gl.createTexture();
+                imgList[img.name].image = new Image();
+                image = imgList[img.name].image;
+            }
+            else {
+                imgList[img.name] = new Image();
+                image = imgList[img.name];
+            }
+            image.onload = onload;
+            image.onerror = onerror;
+            image.src = img.src + api.nocache;
         }
 
         /**
