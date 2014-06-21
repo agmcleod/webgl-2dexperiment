@@ -1,0 +1,5 @@
+me.event = {
+  publish: function () {
+    
+  }
+}
