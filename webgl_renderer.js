@@ -17,6 +17,25 @@ var WebGLRenderer = {
     this.objects.push(object);
   },
 
+  bindAllTextures: function () {
+    var list = me.loader.getImageList();
+    for (var i in list) {
+      if (list.hasOwnProperty(i)) {
+        var image = list[i];
+        this.bindTexture(image);
+      }
+    };
+  },
+
+  bindTexture: function (texture) {
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.bindTexture(gl.TEXTURE_2D, null);
+  },
+
   draw: function () {
     this.resize();
     var delta = this.getDeltaTime();

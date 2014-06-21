@@ -54,6 +54,14 @@
         }
 
         /**
+         * Return the list of images for external use.
+         * @return Object
+         */
+        function getImageList () {
+            return imgList;
+        }
+
+        /**
          * load Images
          * @example
          * preloadImages([
