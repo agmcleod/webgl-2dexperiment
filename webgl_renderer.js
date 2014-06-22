@@ -93,14 +93,14 @@ var WebGLRenderer = {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.planePositionBuffer);
 
     var vertices = [
-      1.0, 1.0, 0.0,
-      -1.0, 1.0, 0.0,
-      1.0, -1.0, 0.0,
-      -1.0, -1.0, 0.0
+      1.0, 1.0,
+      -1.0, 1.0,
+      1.0, -1.0,
+      -1.0, -1.0
     ];
 
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-    this.planePositionBuffer.itemSize = 3;
+    this.planePositionBuffer.itemSize = 2;
     this.planePositionBuffer.numItems = 4;
 
     this.textureBuffer = gl.createBuffer();
