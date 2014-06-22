@@ -6,10 +6,12 @@ var WebGLRenderer = {
     this.initShaders();
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.enable(gl.DEPTH_TEST);
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
     this.mvMatrixStack = [];
     this.objects = [];
-    
+    this.bindAllTextures();    
     this.draw();
   },
 
@@ -61,12 +63,14 @@ var WebGLRenderer = {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.textureBuffer);
     gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, this.textureBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, me.loader.getImage('mobileplayer'));
-    gl.uniform1i(shaderProgram.samplerUniform, 0);
-
-    this.setMatrixUniforms();
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.planePositionBuffer.numItems);
+    for (var i = 0; i < this.objects.length; i++) {
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, this.objects[i].image);
+      gl.uniform1i(shaderProgram.samplerUniform, 0);
+      this.setMatrixUniforms();
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.planePositionBuffer.numItems);
+    }
+    
     requestAnimationFrame(this.draw.bind(this));
   },
 
@@ -102,10 +106,10 @@ var WebGLRenderer = {
     this.textureBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.textureBuffer);
     var textureCoords = [
-      0.0, 1.0,
-      0.0, 0.0,
       1.0, 1.0,
-      1.0, 0.0
+      0.0, 1.0,
+      1.0, 0.0,
+      0.0, 0.0
     ];
 
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords), gl.STATIC_DRAW);

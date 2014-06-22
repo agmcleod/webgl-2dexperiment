@@ -1,8 +1,9 @@
 var Sprite = Object.extend({
-  init: function () {
+  init: function (image) {
     this.direction = 1;
     this.pos = { y: 0 };
     this.vel = { y: 1.5 };
+    this.image = image;
   },
 
   update: function (delta, matrix) {

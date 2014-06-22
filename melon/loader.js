@@ -54,14 +54,6 @@
         }
 
         /**
-         * Return the list of images for external use.
-         * @return Object
-         */
-        function getImageList () {
-            return imgList;
-        }
-
-        /**
          * load Images
          * @example
          * preloadImages([
@@ -281,6 +273,14 @@
          * me.loader.onProgress = this.updateProgress.bind(this);
          */
         api.onProgress = undefined;
+
+        /**
+         * Return the list of images for external use.
+         * @return Object
+         */
+        api.getImageList = function () {
+            return imgList;
+        }
 
         /**
          *  just increment the number of already loaded resources
