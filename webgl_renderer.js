@@ -48,8 +48,8 @@ var WebGLRenderer = {
     mat4.identity(this.mvMatrix);
     mat4.identity(this.pMatrix);
     
-    mat4.perspective(this.pMatrix, 45 * Math.PI / 180, gl.canvas.clientWidth / gl.canvas.clientHeight, 0.1, 100.0);
-    mat4.translate(this.pMatrix, this.pMatrix, [0.0, 0.0, -50.0]);
+    //mat4.perspective(this.pMatrix, 45 * Math.PI / 180, gl.canvas.clientWidth / gl.canvas.clientHeight, 0.1, 100.0);
+    //mat4.translate(this.pMatrix, this.pMatrix, [0.0, 0.0, -50.0]);
 
     var shaderProgram = this.shader.shaderProgram;
     
@@ -93,28 +93,32 @@ var WebGLRenderer = {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.planePositionBuffer);
 
     var vertices = [
-      1.0, 1.0,
+      -1.0, -1.0,
+      1.0, -1.0,
+      -1.0, 1.0,
       -1.0, 1.0,
       1.0, -1.0,
-      -1.0, -1.0
+      1.0, 1.0
     ];
 
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
     this.planePositionBuffer.itemSize = 2;
-    this.planePositionBuffer.numItems = 4;
+    this.planePositionBuffer.numItems = 6;
 
     this.textureBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.textureBuffer);
     var textureCoords = [
-      1.0, 1.0,
+      0.0, 0.0,
+      1.0, 0.0,
+      0.0, 1.0,
       0.0, 1.0,
       1.0, 0.0,
-      0.0, 0.0
+      1.0, 1.0
     ];
 
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords), gl.STATIC_DRAW);
     this.textureBuffer.itemSize = 2;
-    this.textureBuffer.numItems = 4;
+    this.textureBuffer.numItems = 6;
   },
 
   initShaders: function () {
