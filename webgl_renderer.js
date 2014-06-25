@@ -47,6 +47,8 @@ var WebGLRenderer = {
 
     var shaderProgram = this.shader.shaderProgram;
     
+    // TODO: this loop should collect vertices from objects, and do a single drawArrays call instead.
+    // first i need to figure out how best to get the textures together.
     for (var i = 0; i < this.objects.length; i++) {
       var planePositionBuffer = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, planePositionBuffer);
