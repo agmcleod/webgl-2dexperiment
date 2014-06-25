@@ -1,7 +1,9 @@
 var Sprite = Object.extend({
-  init: function (image) {
+  init: function (x, y, width, height, image) {
     this.direction = 1;
-    this.pos = { y: 0 };
+    this.pos = { x: x, y: 0 };
+    this.width = width;
+    this.height = height;
     this.vel = { y: 1.5 };
     this.image = image;
   },
@@ -9,13 +11,13 @@ var Sprite = Object.extend({
   update: function (delta, matrix) {
     if (this.direction > 0) {
       this.pos.y += this.vel.y * delta;
-      if (this.pos.y > 5) {
+      if (this.pos.y >= this.height) {
         this.direction = -1;
       }
     }
     else {
       this.pos.y -= this.vel.y * delta;
-      if (this.pos.y < -5) {
+      if (this.pos.y <= 0) {
         this.direction = 1;
       }
     }
