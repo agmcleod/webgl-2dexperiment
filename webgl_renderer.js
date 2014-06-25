@@ -1,7 +1,5 @@
 var WebGLRenderer = {
   init: function () {
-    this.pMatrix = mat4.create();
-    this.mvMatrix = mat4.create();
     this.initBuffers();
     this.initShaders();
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -45,18 +43,11 @@ var WebGLRenderer = {
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    mat4.identity(this.mvMatrix);
-    mat4.identity(this.pMatrix);
-    
-    //mat4.perspective(this.pMatrix, 45 * Math.PI / 180, gl.canvas.clientWidth / gl.canvas.clientHeight, 0.1, 100.0);
-    //mat4.translate(this.pMatrix, this.pMatrix, [0.0, 0.0, -50.0]);
+    var resolutionLocation = gl.getUniformLocation(this.shader.shaderProgram, "uResolution");
+    gl.uniform2f(resolutionLocation, gl.canvas.clientWidth, gl.canvas.clientHeight);
 
     var shaderProgram = this.shader.shaderProgram;
     
-    for (var i = 0; i < this.objects.length; i++) {
-      this.objects[i].update(delta, this.mvMatrix);
-    }
-
     gl.bindBuffer(gl.ARRAY_BUFFER, this.planePositionBuffer);
     gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, this.planePositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
@@ -67,7 +58,6 @@ var WebGLRenderer = {
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, this.objects[i].image);
       gl.uniform1i(shaderProgram.samplerUniform, 0);
-      this.setMatrixUniforms();
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.planePositionBuffer.numItems);
     }
     
@@ -93,12 +83,12 @@ var WebGLRenderer = {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.planePositionBuffer);
 
     var vertices = [
-      -1.0, -1.0,
-      1.0, -1.0,
-      -1.0, 1.0,
-      -1.0, 1.0,
-      1.0, -1.0,
-      1.0, 1.0
+      0, 0,
+      128, 0,
+      0, 128,
+      0, 128,
+      128, 0,
+      128, 128
     ];
 
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
@@ -130,8 +120,6 @@ var WebGLRenderer = {
     shaderProgram.textureCoordAttribute = gl.getAttribLocation(shaderProgram, "aTextureCoord");
     gl.enableVertexAttribArray(shaderProgram.textureCoordAttribute);
 
-    shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
-    shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
     shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "uSampler");
   },
 
@@ -156,11 +144,6 @@ var WebGLRenderer = {
       gl.canvas.width = width;
       gl.canvas.height = height;
     }
-  },
-
-  setMatrixUniforms: function () {
-    gl.uniformMatrix4fv(this.shader.shaderProgram.pMatrixUniform, false, this.pMatrix);
-    gl.uniformMatrix4fv(this.shader.shaderProgram.mvMatrixUniform, false, this.mvMatrix);
   }
   
 };
