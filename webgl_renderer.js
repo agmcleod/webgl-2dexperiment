@@ -1,6 +1,5 @@
 var WebGLRenderer = {
   init: function () {
-    this.initBuffers();
     this.initShaders();
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.enable(gl.DEPTH_TEST);
@@ -48,17 +47,40 @@ var WebGLRenderer = {
 
     var shaderProgram = this.shader.shaderProgram;
     
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.planePositionBuffer);
-    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, this.planePositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+    var planePositionBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, planePositionBuffer);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.textureBuffer);
-    gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, this.textureBuffer.itemSize, gl.FLOAT, false, 0, 0);
+    var vertices = [
+      0, 0,
+      128, 0,
+      0, 128,
+      0, 128,
+      128, 0,
+      128, 128
+    ];
+
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
+
+    var textureBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, textureBuffer);
+    var textureCoords = [
+      0.0, 1.0,
+      1.0, 1.0,
+      0.0, 0.0,
+      0.0, 0.0,
+      1.0, 1.0,
+      1.0, 0.0
+    ];
+
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords), gl.STATIC_DRAW);
+    gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, 2, gl.FLOAT, false, 0, 0);
 
     for (var i = 0; i < this.objects.length; i++) {
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, this.objects[i].image);
       gl.uniform1i(shaderProgram.samplerUniform, 0);
-      gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.planePositionBuffer.numItems);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 6);
     }
     
     requestAnimationFrame(this.draw.bind(this));
@@ -76,39 +98,6 @@ var WebGLRenderer = {
       this.time = Date.now();
     }
     return delta;
-  },
-
-  initBuffers: function () {
-    this.planePositionBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.planePositionBuffer);
-
-    var vertices = [
-      0, 0,
-      128, 0,
-      0, 128,
-      0, 128,
-      128, 0,
-      128, 128
-    ];
-
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-    this.planePositionBuffer.itemSize = 2;
-    this.planePositionBuffer.numItems = 6;
-
-    this.textureBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.textureBuffer);
-    var textureCoords = [
-      0.0, 0.0,
-      1.0, 0.0,
-      0.0, 1.0,
-      0.0, 1.0,
-      1.0, 0.0,
-      1.0, 1.0
-    ];
-
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords), gl.STATIC_DRAW);
-    this.textureBuffer.itemSize = 2;
-    this.textureBuffer.numItems = 6;
   },
 
   initShaders: function () {
