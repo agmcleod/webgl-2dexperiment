@@ -7,6 +7,8 @@ var WebGLRenderer = {
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
     this.mvMatrixStack = [];
+    this.mvMatrix = mat3.create();
+    console.log(this.mvMatrix);
     this.objects = [];
     this.bindAllTextures();    
     this.draw();
@@ -42,15 +44,13 @@ var WebGLRenderer = {
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    var resolutionLocation = gl.getUniformLocation(this.shader.shaderProgram, "uResolution");
-    gl.uniform2f(resolutionLocation, gl.canvas.clientWidth, gl.canvas.clientHeight);
-
     var shaderProgram = this.shader.shaderProgram;
     
     // TODO: this loop should collect vertices from objects, and do a single drawArrays call instead.
     // first i need to figure out how best to get the textures together.
     for (var i = 0; i < this.objects.length; i++) {
       var planePositionBuffer = gl.createBuffer();
+      mat3.identity(this.mvMatrix);
       gl.bindBuffer(gl.ARRAY_BUFFER, planePositionBuffer);
       var object = this.objects[i];
 
@@ -88,6 +88,8 @@ var WebGLRenderer = {
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, this.objects[i].image);
       gl.uniform1i(shaderProgram.samplerUniform, 0);
+      var matrixLocation = gl.getUniformLocation(shaderProgram, "uMatrix");
+      gl.uniformMatrix3fv(matrixLocation, false, this.mvMatrix);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 6);
     }
     
