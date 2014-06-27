@@ -8,7 +8,7 @@ var Game = {
 
   startGame: function () {
     WebGLRenderer.init();
-    this.sprite = new Sprite(0, 0, 128, 128, me.loader.getImage('player'));
+    this.sprite = new Sprite(0, 0, 32, 32, me.loader.getImage('player'));
     WebGLRenderer.addChild(this.sprite);
     WebGLRenderer.draw();
   }
