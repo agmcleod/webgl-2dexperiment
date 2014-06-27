@@ -6,9 +6,7 @@ var WebGLRenderer = {
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-    this.mvMatrixStack = [];
     this.mvMatrix = mat3.create();
-    console.log(this.mvMatrix);
     this.objects = [];
     this.bindAllTextures();    
     this.draw();
@@ -41,7 +39,7 @@ var WebGLRenderer = {
     this.resize();
     var delta = this.getDeltaTime();
     
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    gl.viewport(0, 0, gl.canvas.clientWidth, gl.canvas.clientHeight);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     var shaderProgram = this.shader.shaderProgram;
@@ -84,12 +82,19 @@ var WebGLRenderer = {
 
       gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords), gl.STATIC_DRAW);
       gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, 2, gl.FLOAT, false, 0, 0);
+      mat3.multiply(this.mvMatrix, this.mvMatrix, [
+        2 / gl.canvas.clientWidth, 0, 0,
+        0, -2 / gl.canvas.clientHeight, 0,
+        -1, 1, 1
+      ]);
+
+      var matrixLocation = gl.getUniformLocation(shaderProgram, "uMatrix");
+      gl.uniformMatrix3fv(matrixLocation, false, this.mvMatrix);
 
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, this.objects[i].image);
       gl.uniform1i(shaderProgram.samplerUniform, 0);
-      var matrixLocation = gl.getUniformLocation(shaderProgram, "uMatrix");
-      gl.uniformMatrix3fv(matrixLocation, false, this.mvMatrix);
+
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 6);
     }
     
@@ -120,19 +125,6 @@ var WebGLRenderer = {
     gl.enableVertexAttribArray(shaderProgram.textureCoordAttribute);
 
     shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "uSampler");
-  },
-
-  mvPopMatrix: function () {
-    if (this.mvMatrixStack.length === 0) {
-      throw "Invalid popMatrix!";
-    }
-    this.mvMatrix = mvMatrixStack.pop();
-  },
-
-  mvPushMatrix: function () {
-    var copy = mat4.create();
-    mat4.set(this.mvMatrix, copy);
-    this.mvMatrixStack.push(copy);
   },
 
   resize: function () {
