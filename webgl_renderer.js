@@ -43,6 +43,8 @@ var WebGLRenderer = {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     var shaderProgram = this.shader.shaderProgram;
+
+    var matrixLocation = gl.getUniformLocation(shaderProgram, "uMatrix");
     
     // TODO: this loop should collect vertices from objects, and do a single drawArrays call instead.
     // first i need to figure out how best to get the textures together.
@@ -52,18 +54,18 @@ var WebGLRenderer = {
       gl.bindBuffer(gl.ARRAY_BUFFER, planePositionBuffer);
       var object = this.objects[i];
 
-      var x = object.pos.x;
-      var y = object.pos.y;
-      var lx = object.pos.x + object.width;
-      var by = object.pos.y + object.height;
+      var x1 = object.pos.x;
+      var y1 = object.pos.y;
+      var x2 = object.pos.x + object.width;
+      var y2 = object.pos.y + object.height;
 
       var vertices = [
-        object.pos.x, object.pos.y,
-        lx, y,
-        x, by,
-        x, by,
-        lx, y,
-        lx, by
+        x1, y1,
+        x2, y1,
+        x1, y2,
+        x1, y2,
+        x2, y1,
+        x2, y2
       ];
 
       gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
@@ -72,32 +74,32 @@ var WebGLRenderer = {
       var textureBuffer = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, textureBuffer);
 
-      var dw = this.objects[i].width / this.objects[i].image.image.width;
-      var dh = this.objects[i].height / this.objects[i].image.image.height;
+      var dw = 1.0 //this.objects[i].width / this.objects[i].image.image.width;
+      var dh = 1.0 //this.objects[i].height / this.objects[i].image.image.height;
 
       var textureCoords = [
+        0.0, 0.0,
+        dw, 0.0,
         0.0, dh,
-        dw, dh,
-        0.0, 0.0,
-        0.0, 0.0,
-        dw, dh,
-        dw, 0.0
+        0.0, dh,
+        dw, 0.0,
+        dw, dh
       ];
 
       gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords), gl.STATIC_DRAW);
       gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, 2, gl.FLOAT, false, 0, 0);
+      
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, this.objects[i].image);
+      gl.uniform1i(shaderProgram.samplerUniform, 0);
+
       mat3.multiply(this.mvMatrix, this.mvMatrix, [
         2 / gl.canvas.clientWidth, 0, 0,
         0, -2 / gl.canvas.clientHeight, 0,
         -1, 1, 1
       ]);
 
-      var matrixLocation = gl.getUniformLocation(shaderProgram, "uMatrix");
       gl.uniformMatrix3fv(matrixLocation, false, this.mvMatrix);
-
-      gl.activeTexture(gl.TEXTURE0);
-      gl.bindTexture(gl.TEXTURE_2D, this.objects[i].image);
-      gl.uniform1i(shaderProgram.samplerUniform, 0);
 
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 6);
     }
