@@ -72,8 +72,8 @@ var WebGLRenderer = {
       var textureBuffer = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, textureBuffer);
 
-      var dw = this.objects[i].width / this.objects[i].image.width;
-      var dh = this.objects[i].height / this.objects[i].image.height;
+      var dw = this.objects[i].width / this.objects[i].image.image.width;
+      var dh = this.objects[i].height / this.objects[i].image.image.height;
 
       var textureCoords = [
         0.0, dh,
