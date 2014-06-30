@@ -74,15 +74,15 @@ var WebGLRenderer = {
       var textureBuffer = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, textureBuffer);
 
-      var dw = 1.0; //this.objects[i].width / this.objects[i].image.image.width;
-      var dh = 1.0; //this.objects[i].height / this.objects[i].image.image.height;
+      var dw = 1.0 - (this.objects[i].width / this.objects[i].image.image.width);
+      var dh = 1.0 - (this.objects[i].height / this.objects[i].image.image.height);
 
       var textureCoords = [
-        0.0, 0.0,
-        dw, 0.0,
-        0.0, dh,
-        0.0, dh,
-        dw, 0.0,
+        1.0, 1.0,
+        dw, 1.0,
+        1.0, dh,
+        1.0, dh,
+        dw, 1.0,
         dw, dh
       ];
 
@@ -91,8 +91,8 @@ var WebGLRenderer = {
 
       mat3.multiply(this.mvMatrix, this.mvMatrix, [
         2 / gl.canvas.clientWidth, 0, 0,
-        0, 2 / gl.canvas.clientHeight, 0,
-        -1, -1, 1
+        0, -2 / gl.canvas.clientHeight, 0,
+        -1, 1, 1
       ]);
 
       gl.uniformMatrix3fv(matrixLocation, false, this.mvMatrix);
