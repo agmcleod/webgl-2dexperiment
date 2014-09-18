@@ -17,18 +17,18 @@
       precision mediump float;
 
       varying vec2 vTextureCoord;
-
       uniform sampler2D uSampler;
+      uniform vec4 uColor;
 
       void main(void) {
-        gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+        gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t)) * uColor;
       }
     </script>
 
     <script id="shader-vs" type="x-shader/x-vertex">
       attribute vec2 aVertexPosition;
       attribute vec2 aTextureCoord;
-
+      
       uniform mat3 uMatrix;
       varying vec2 vTextureCoord;
 
@@ -48,6 +48,7 @@
     <script src="melon/loader.js"></script>
     <script src="webgl_renderer.js"></script>
     <script src="sprite.js"></script>
+    <script src="rect.js"></script>
     <script>
       var gl;
       function initWebGL () {

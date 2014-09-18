@@ -1,6 +1,7 @@
 var WebGLRenderer = {
   init: function () {
     this.initShaders();
+    this.bindBuffers();
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.BLEND);
@@ -24,6 +25,15 @@ var WebGLRenderer = {
         this.bindTexture(image);
       }
     };
+
+    this.white1PixelTexture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, this.white1PixelTexture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([255,255,255,255]));
+  },
+
+  bindBuffers: function () {
+    this.planePositionBuffer = gl.createBuffer();
+    this.textureBuffer = gl.createBuffer();
   },
 
   bindTexture: function (texture) {
@@ -49,9 +59,8 @@ var WebGLRenderer = {
     // TODO: this loop should collect vertices from objects, and do a single drawArrays call instead.
     // first i need to figure out how best to get the textures together.
     for (var i = 0; i < this.objects.length; i++) {
-      var planePositionBuffer = gl.createBuffer();
       mat3.identity(this.mvMatrix);
-      gl.bindBuffer(gl.ARRAY_BUFFER, planePositionBuffer);
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.planePositionBuffer);
       var object = this.objects[i];
 
       var x1 = object.pos.x;
@@ -71,23 +80,30 @@ var WebGLRenderer = {
       gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
       gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
 
-      var textureBuffer = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, textureBuffer);
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.textureBuffer);
+      
+      var textureCoords;
+      if (object.image) {
+        var dw = (object.width / object.image.image.width);
+        var dh = 1.0 - (object.height / object.image.image.height);
+        textureCoords = [
+          0.0, 1.0,
+          dw, 1.0,
+          0.0, dh,
+          0.0, dh,
+          dw, 1.0,
+          dw, dh
+        ];
 
-      var dw = (this.objects[i].width / this.objects[i].image.image.width);
-      var dh = 1.0 - (this.objects[i].height / this.objects[i].image.image.height);
-
-      var textureCoords = [
-        0.0, 1.0,
-        dw, 1.0,
-        0.0, dh,
-        0.0, dh,
-        dw, 1.0,
-        dw, dh
-      ];
-
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords), gl.STATIC_DRAW);
-      gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, 2, gl.FLOAT, false, 0, 0);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, this.objects[i].image);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords), gl.STATIC_DRAW);
+        gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, 2, gl.FLOAT, false, 0, 0);
+      }
+      else {
+        gl.bindTexture(gl.TEXTURE_2D, this.white1PixelTexture);
+      }
+      
 
       mat3.multiply(this.mvMatrix, this.mvMatrix, [
         2 / gl.canvas.clientWidth, 0, 0,
@@ -96,10 +112,17 @@ var WebGLRenderer = {
       ]);
 
       gl.uniformMatrix3fv(matrixLocation, false, this.mvMatrix);
-      
-      gl.activeTexture(gl.TEXTURE0);
-      gl.bindTexture(gl.TEXTURE_2D, this.objects[i].image);
+
       gl.uniform1i(shaderProgram.samplerUniform, 0);
+
+      var colorLocation = gl.getUniformLocation(shaderProgram, "uColor");
+      if (object.color) {
+        var color = object.color;
+        gl.uniform4f(colorLocation, color.r, color.g, color.b, 1);
+      }
+      else {
+        gl.uniform4f(colorLocation, 1.0, 1.0, 1.0, 1);
+      }
 
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 6);
     }
