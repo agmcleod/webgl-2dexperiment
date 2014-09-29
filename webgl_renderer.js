@@ -84,15 +84,24 @@ var WebGLRenderer = {
       
       var textureCoords;
       if (object.image) {
-        var dw = (object.width / object.image.image.width);
-        var dh = 1.0 - (object.height / object.image.image.height);
+        var srcImage = object.image.image;
+        var sx = object.offset.x;
+        var sy = object.offset.y;
+        var sw = object.width;
+        var sh = object.height;
+
+        var tx1 = sx / srcImage.width;
+        var ty1 = 1.0 - (sy / srcImage.height);
+        var tx2 = ((sx + sw) / srcImage.width);
+        var ty2 = 1.0 - ((sy + sh) / srcImage.height);
+
         textureCoords = [
-          0.0, 1.0,
-          dw, 1.0,
-          0.0, dh,
-          0.0, dh,
-          dw, 1.0,
-          dw, dh
+          tx1, ty1,
+          tx2, ty1,
+          tx1, ty2,
+          tx1, ty2,
+          tx2, ty1,
+          tx2, ty2
         ];
 
         gl.activeTexture(gl.TEXTURE0);
@@ -151,6 +160,7 @@ var WebGLRenderer = {
     gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
 
     shaderProgram.textureCoordAttribute = gl.getAttribLocation(shaderProgram, "aTextureCoord");
+
     gl.enableVertexAttribArray(shaderProgram.textureCoordAttribute);
 
     shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "uSampler");

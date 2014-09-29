@@ -5,6 +5,7 @@ var Sprite = Object.extend({
     this.width = width;
     this.height = height;
     this.vel = { y: 1.5 };
+    this.offset = { x: 0, y: 32 };
     this.image = image;
   },
 
