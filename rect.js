@@ -4,5 +4,7 @@ var Rect = Object.extend({
     this.width = width;
     this.height = height;
     this.color = color;
-  }
+  },
+
+  update: function () {}
 });

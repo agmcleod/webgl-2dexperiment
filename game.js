@@ -4,6 +4,9 @@ var Game = {
     me.loader.preload([{
       type: "image", name: "player", src: "data/player.png"
     }]);
+    input.init();
+    input.bindEventForKey(input.KEY.LEFT);
+    input.bindEventForKey(input.KEY.RIGHT);
   },
 
   startGame: function () {

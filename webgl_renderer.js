@@ -46,8 +46,12 @@ var WebGLRenderer = {
   },
 
   draw: function () {
-    this.resize();
     var delta = this.getDeltaTime();
+    for (var i = 0; i < this.objects.length; i++) {
+      this.objects[i].update(delta);
+    }
+
+    this.resize();
     
     gl.viewport(0, 0, gl.canvas.clientWidth, gl.canvas.clientHeight);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);

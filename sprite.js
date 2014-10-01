@@ -4,25 +4,59 @@ var Sprite = Object.extend({
     this.pos = { x: x, y: 0 };
     this.width = width;
     this.height = height;
-    this.vel = { y: 1.5 };
-    this.offset = { x: 0, y: 32 };
+    this.vel = { x: 100, y: 100 };
+    this.offset = { x: 0, y: 0 };
     this.image = image;
+
+    // heavily hardcoded frame positions
+    this.frames = [
+      {x: 0, y: 0},
+      {x: 32, y: 0},
+      {x: 64, y: 0},
+      {x: 92, y: 0},
+      {x: 0, y: 32},
+      {x: 32, y: 32},
+      {x: 64, y: 32},
+      {x: 92, y: 32},
+      {x: 0, y: 64},
+      {x: 32, y: 64}
+    ];
+
+    this.anims = {
+      "walk": [1,2,3,4,5,6,7,8,9],
+      "idle": [0]
+    };
+
+    this.currentAnim = "idle";
+    this.frameSpeed = 20 / 1000;
+    this.currentFrame = { idx: 0, speed: this.frameSpeed };
   },
 
-  update: function (delta, matrix) {
-    if (this.direction > 0) {
-      this.pos.y += this.vel.y * delta;
-      if (this.pos.y >= this.height) {
-        this.direction = -1;
+  update: function (delta) {
+    this.currentFrame.speed -= delta;
+    var anim = this.anims[this.currentAnim];
+    if (this.currentFrame.speed <= 0) {
+      this.currentFrame.speed = this.frameSpeed;
+      this.currentFrame.idx++;
+      if (this.currentFrame.idx >= anim.length) {
+        this.currentFrame.idx = 0;
+      }
+      this.offset.x = this.frames[anim[this.currentFrame.idx]].x;
+      this.offset.y = this.frames[anim[this.currentFrame.idx]].y;
+    }
+
+    if (input.isPressed(input.KEY.RIGHT)) {
+      this.pos.x += this.vel.x * delta;
+      if (this.currentAnim !== "walk") {
+        this.currentFrame.idx = 0;
+        this.currentAnim = "walk";
       }
     }
     else {
-      this.pos.y -= this.vel.y * delta;
-      if (this.pos.y <= 0) {
-        this.direction = 1;
+      if (this.currentAnim !== "idle") {
+        this.currentFrame.idx = 0;
+        this.currentAnim = "idle";
       }
     }
-
-    mat4.translate(matrix, matrix, [0.0, this.pos.y, 0.0]);
   }
 });
